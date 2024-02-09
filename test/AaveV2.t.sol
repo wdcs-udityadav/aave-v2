@@ -17,7 +17,6 @@ contract AaveV2Test is Test {
     AaveV2 public aaveV2;
 
     IERC20 constant DAI = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    // IERC20 constant DAI = IERC20(0x0D8775F648430679A709E98d2b0Cb6250d2887EF);
     address user = vm.addr(1);
 
     function setUp() public {
