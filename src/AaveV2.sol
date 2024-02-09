@@ -46,9 +46,9 @@ contract AaveV2 {
         return (totalCollateralETH, availableBorrowsETH, totalDebtETH);
     }
 
-    function getReserveData(address _asset) public view returns (address, address, address) {
+    function getReserveData(address _asset) public view returns (address, address) {
         DataTypes.ReserveData memory reserveData = pool.getReserveData(_asset);
-        return (reserveData.aTokenAddress, reserveData.stableDebtTokenAddress, reserveData.variableDebtTokenAddress);
+        return (reserveData.aTokenAddress, reserveData.variableDebtTokenAddress);
     }
 
     function withdraw(address _asset, address _aToken, uint256 _aTokenBalance, uint256 _amount, address _to) external {
@@ -58,31 +58,23 @@ contract AaveV2 {
         pool.withdraw(_asset, _amount, _to);
     }
 
-    function approveDelegation(
-        address stableDebtTokenAddress,
-        address variableDebtTokenAddress,
-        uint256 amount,
-        address user
-    ) external {
-        ICreditDelegationToken(stableDebtTokenAddress).approveDelegation(address(this), amount);
+    function approveDelegation(address variableDebtTokenAddress, uint256 amount, address user) external {
         ICreditDelegationToken(variableDebtTokenAddress).approveDelegation(address(this), amount);
 
         uint256 allowance = ICreditDelegationToken(variableDebtTokenAddress).borrowAllowance(user, address(this));
         console.log("allowance:", allowance);
     }
 
-    function borrow(
-        // address _aToken, uint256 _aTokenBalance,
-        address _asset,
-        uint256 _amount,
-        address _behalfOf
-    ) external {
+    function borrow(address _asset, uint256 _amount, address _behalfOf) external {
         uint256 interestRateMode = 2;
         uint16 refCode = 0;
 
-        // IERC20(_aToken).safeTransferFrom(_behalfOf, address(this), _aTokenBalance);
-        // IERC20(_aToken).safeApprove(address(pool), _aTokenBalance);
-
         pool.borrow(_asset, _amount, interestRateMode, refCode, _behalfOf);
+    }
+
+    function repay(address _asset, uint256 _amount, address _behalfOf) external {
+        uint256 rateMode = 2;
+        IERC20(_asset).safeApprove(address(pool), _amount);
+        pool.repay(_asset, _amount, rateMode, _behalfOf);
     }
 }
