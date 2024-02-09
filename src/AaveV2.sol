@@ -35,14 +35,8 @@ contract AaveV2 {
     }
 
     function getUserAccountData(address _user) external view returns (uint256, uint256, uint256) {
-        (
-            uint256 totalCollateralETH,
-            uint256 totalDebtETH,
-            uint256 availableBorrowsETH,
-            uint256 currentLiquidationThreshold,
-            uint256 ltv,
-            uint256 healthFactor
-        ) = pool.getUserAccountData(_user);
+        (uint256 totalCollateralETH, uint256 totalDebtETH, uint256 availableBorrowsETH,,,) =
+            pool.getUserAccountData(_user);
         return (totalCollateralETH, availableBorrowsETH, totalDebtETH);
     }
 

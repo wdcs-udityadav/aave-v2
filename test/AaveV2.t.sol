@@ -77,31 +77,27 @@ contract AaveV2Test is Test {
     function testBorrow() public {
         uint256 amountDeposited = 10000 * 1e18;
         testDeposit();
+        console.log("******borrow*******");
+
         uint256 debtToken = 50 * 1e18;
 
         vm.startPrank(user);
         (address aToken, address variableDebtTokenAddress) = aaveV2.getReserveData(address(DAI));
-
         assertEq(IERC20(aToken).balanceOf(user), amountDeposited);
         assertEq(IERC20(variableDebtTokenAddress).balanceOf(user), 0);
 
-        (uint256 totalCollateralETH, uint256 availableBorrowsETH, uint256 totalDebtETH) =
-            aaveV2.getUserAccountData(user);
-        console.log("totalCollateralETH: ", totalCollateralETH);
-        console.log("availableBorrowsETH: ", availableBorrowsETH);
-        console.log("totalDebtETH: ", totalDebtETH);
+        (,, uint256 totalDebtETH) = aaveV2.getUserAccountData(user);
+        console.log("initital totalDebtETH: ", totalDebtETH);
 
         ICreditDelegationToken(variableDebtTokenAddress).approveDelegation(address(aaveV2), debtToken);
-
         assertEq(ICreditDelegationToken(variableDebtTokenAddress).borrowAllowance(user, address(aaveV2)), debtToken);
 
         aaveV2.borrow(address(DAI), debtToken, user);
 
-        (uint256 totalCollateralETH2, uint256 availableBorrowsETH2, uint256 totalDebtETH2) =
-            aaveV2.getUserAccountData(user);
-        console.log("totalCollateralETH: ", totalCollateralETH2);
-        console.log("availableBorrowsETH: ", availableBorrowsETH2);
-        console.log("totalDebtETH: ", totalDebtETH2);
+        assertEq(IERC20(aToken).balanceOf(user), amountDeposited);
+
+        (,, uint256 totalDebtETH_) = aaveV2.getUserAccountData(user);
+        console.log("final totalDebtETH: ", totalDebtETH_);
 
         assertEq(IERC20(variableDebtTokenAddress).balanceOf(user), debtToken);
         assertEq(DAI.balanceOf(address(aaveV2)), debtToken);
@@ -112,21 +108,22 @@ contract AaveV2Test is Test {
     function testRepay() public {
         testBorrow();
 
-        uint256 debtToken = 51 * 1e18;
+        console.log("******repayment*******");
+        uint256 debtAmount = 50 * 1e18;
+        uint256 repayAmount = 51 * 1e18;
         vm.startPrank(user);
+        (, address variableDebtTokenAddress) = aaveV2.getReserveData(address(DAI));
 
-        (uint256 totalCollateralETH, uint256 availableBorrowsETH, uint256 totalDebtETH) =
-            aaveV2.getUserAccountData(user);
-        console.log("totalCollateralETH: ", totalCollateralETH);
-        console.log("availableBorrowsETH: ", availableBorrowsETH);
-        console.log("totalDebtETH: ", totalDebtETH);
-        aaveV2.repay(address(DAI), debtToken, user);
+        (,, uint256 totalDebtETH) = aaveV2.getUserAccountData(user);
+        console.log("inital totalDebtETH: ", totalDebtETH);
 
-        (uint256 totalCollateralETH2, uint256 availableBorrowsETH2, uint256 totalDebtETH2) =
-            aaveV2.getUserAccountData(user);
-        console.log("totalCollateralETH: ", totalCollateralETH2);
-        console.log("availableBorrowsETH: ", availableBorrowsETH2);
-        console.log("totalDebtETH: ", totalDebtETH2);
+        assertEq(IERC20(variableDebtTokenAddress).balanceOf(user), debtAmount);
+        aaveV2.repay(address(DAI), repayAmount, user);
+
+        (,, uint256 totalDebtETH_) = aaveV2.getUserAccountData(user);
+        console.log("final totalDebtETH: ", totalDebtETH_);
+        assertEq(IERC20(variableDebtTokenAddress).balanceOf(user), 0);
+
         vm.stopPrank();
     }
 }
