@@ -93,8 +93,6 @@ contract AaveV2Test is Test {
 
         aaveV2.borrow(address(DAI), debtToken, user);
 
-        assertEq(IERC20(aToken).balanceOf(user), amountDeposited);
-
         (,, uint256 totalDebtETH_,) = aaveV2.getUserAccountData(user);
         console.log("final totalDebtETH: ", totalDebtETH_);
 

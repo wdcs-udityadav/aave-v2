@@ -52,13 +52,6 @@ contract AaveV2 {
         pool.withdraw(_asset, _amount, _to);
     }
 
-    function approveDelegation(address variableDebtTokenAddress, uint256 amount, address user) external {
-        ICreditDelegationToken(variableDebtTokenAddress).approveDelegation(address(this), amount);
-
-        uint256 allowance = ICreditDelegationToken(variableDebtTokenAddress).borrowAllowance(user, address(this));
-        console.log("allowance:", allowance);
-    }
-
     function borrow(address _asset, uint256 _amount, address _behalfOf) external {
         uint256 interestRateMode = 2;
         uint16 refCode = 0;
