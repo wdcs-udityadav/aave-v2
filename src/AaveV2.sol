@@ -34,10 +34,10 @@ contract AaveV2 {
         pool.deposit(_asset, _amount, _behalfOf, refCode);
     }
 
-    function getUserAccountData(address _user) external view returns (uint256, uint256, uint256) {
-        (uint256 totalCollateralETH, uint256 totalDebtETH, uint256 availableBorrowsETH,,,) =
+    function getUserAccountData(address _user) external view returns (uint256, uint256, uint256, uint256) {
+        (uint256 totalCollateralETH, uint256 totalDebtETH, uint256 availableBorrowsETH,,, uint256 healthFactor) =
             pool.getUserAccountData(_user);
-        return (totalCollateralETH, availableBorrowsETH, totalDebtETH);
+        return (totalCollateralETH, availableBorrowsETH, totalDebtETH, healthFactor);
     }
 
     function getReserveData(address _asset) public view returns (address, address) {
@@ -70,5 +70,11 @@ contract AaveV2 {
         uint256 rateMode = 2;
         IERC20(_asset).safeApprove(address(pool), _amount);
         pool.repay(_asset, _amount, rateMode, _behalfOf);
+    }
+
+    function liquidationCall(address _collateralAsset, address _debtAsset, address _user) external {
+        uint256 _debtToCover = uint256(-1);
+        bool _receiveAToken = false;
+        pool.liquidationCall(_collateralAsset, _debtAsset, _user, _debtToCover, _receiveAToken);
     }
 }

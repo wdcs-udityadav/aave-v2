@@ -86,7 +86,7 @@ contract AaveV2Test is Test {
         assertEq(IERC20(aToken).balanceOf(user), amountDeposited);
         assertEq(IERC20(variableDebtTokenAddress).balanceOf(user), 0);
 
-        (,, uint256 totalDebtETH) = aaveV2.getUserAccountData(user);
+        (,, uint256 totalDebtETH,) = aaveV2.getUserAccountData(user);
         console.log("initital totalDebtETH: ", totalDebtETH);
 
         ICreditDelegationToken(variableDebtTokenAddress).approveDelegation(address(aaveV2), debtToken);
@@ -96,7 +96,7 @@ contract AaveV2Test is Test {
 
         assertEq(IERC20(aToken).balanceOf(user), amountDeposited);
 
-        (,, uint256 totalDebtETH_) = aaveV2.getUserAccountData(user);
+        (,, uint256 totalDebtETH_,) = aaveV2.getUserAccountData(user);
         console.log("final totalDebtETH: ", totalDebtETH_);
 
         assertEq(IERC20(variableDebtTokenAddress).balanceOf(user), debtToken);
@@ -114,16 +114,23 @@ contract AaveV2Test is Test {
         vm.startPrank(user);
         (, address variableDebtTokenAddress) = aaveV2.getReserveData(address(DAI));
 
-        (,, uint256 totalDebtETH) = aaveV2.getUserAccountData(user);
+        (,, uint256 totalDebtETH,) = aaveV2.getUserAccountData(user);
         console.log("inital totalDebtETH: ", totalDebtETH);
 
         assertEq(IERC20(variableDebtTokenAddress).balanceOf(user), debtAmount);
         aaveV2.repay(address(DAI), repayAmount, user);
 
-        (,, uint256 totalDebtETH_) = aaveV2.getUserAccountData(user);
+        (,, uint256 totalDebtETH_,) = aaveV2.getUserAccountData(user);
         console.log("final totalDebtETH: ", totalDebtETH_);
         assertEq(IERC20(variableDebtTokenAddress).balanceOf(user), 0);
 
+        vm.stopPrank();
+    }
+
+    function testFailLiquidationCall() public {
+        testBorrow();
+        vm.startPrank(user);
+        aaveV2.liquidationCall(address(DAI), address(DAI), user);
         vm.stopPrank();
     }
 }
