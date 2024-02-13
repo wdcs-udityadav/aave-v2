@@ -5,10 +5,8 @@ pragma experimental ABIEncoderV2;
 import {Test, console} from "forge-std/Test.sol";
 import {FlashLoan} from "../src/FlashLoan.sol";
 
-import "aaveV2/contracts/protocol/lendingpool/LendingPool.sol";
 import "aaveV2/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 import "aaveV2/contracts/dependencies/openzeppelin/contracts/SafeERC20.sol";
-import "aaveV2/contracts/interfaces/ICreditDelegationToken.sol";
 
 contract FlashLoanTest is Test {
     using SafeERC20 for IERC20;
