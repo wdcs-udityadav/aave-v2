@@ -8,9 +8,6 @@ import "aaveV2/contracts/protocol/lendingpool/LendingPool.sol";
 import "aaveV2/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 import "aaveV2/contracts/dependencies/openzeppelin/contracts/SafeERC20.sol";
 import {DataTypes} from "aaveV2/contracts/protocol/libraries/types/DataTypes.sol";
-import "aaveV2/contracts/interfaces/ICreditDelegationToken.sol";
-
-import "forge-std/console.sol";
 
 contract AaveV2 {
     using SafeERC20 for IERC20;
